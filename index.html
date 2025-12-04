@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decision Coin - Make Decisions Fun!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 30px;
+            padding: 40px 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .options-container {
+            margin-bottom: 30px;
+        }
+
+        .option-group {
+            margin-bottom: 15px;
+        }
+
+        .option-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .option-a-label {
+            color: #4A90D9;
+        }
+
+        .option-b-label {
+            color: #F5A623;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .option-a-input:focus {
+            border-color: #4A90D9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .option-b-input:focus {
+            border-color: #F5A623;
+            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1);
+        }
+
+        .vs-divider {
+            text-align: center;
+            font-weight: 800;
+            font-size: 1.5em;
+            color: #ccc;
+            margin: 20px 0;
+            letter-spacing: 3px;
+        }
+
+        .coin-container {
+            display: flex;
+            justify-content: center;
+            margin: 40px 0;
+            perspective: 1000px;
+        }
+
+        .coin {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            transform-style: preserve-3d;
+            user-select: none;
+        }
+
+        .coin:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .coin:active {
+            transform: scale(0.95);
+        }
+
+        .coin.flipping {
+            animation: flip 1.5s ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes flip {
+            0% {
+                transform: rotateY(0deg) rotateX(0deg);
+            }
+            25% {
+                transform: rotateY(180deg) rotateX(180deg);
+            }
+            50% {
+                transform: rotateY(360deg) rotateX(360deg);
+            }
+            75% {
+                transform: rotateY(540deg) rotateX(540deg);
+            }
+            100% {
+                transform: rotateY(720deg) rotateX(720deg);
+            }
+        }
+
+        .coin-text {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .coin-instruction {
+            font-size: 0.8em;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        .result-container {
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .result {
+            font-size: 1.8em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.5s ease;
+        }
+
+        .result.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .result.winner-a {
+            color: #4A90D9;
+            animation: celebrate 0.6s ease-out;
+        }
+
+        .result.winner-b {
+            color: #F5A623;
+            animation: celebrate 0.6s ease-out;
+        }
+
+        @keyframes celebrate {
+            0%, 100% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.2) rotate(-5deg);
+            }
+            75% {
+                transform: scale(1.2) rotate(5deg);
+            }
+        }
+
+        .result-label {
+            color: #666;
+            font-size: 0.9em;
+            opacity: 0;
+            transition: opacity 0.5s ease 0.3s;
+        }
+
+        .result-label.show {
+            opacity: 1;
+        }
+
+        .flip-again-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .flip-again-btn.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .flip-again-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .flip-again-btn:active {
+            transform: translateY(0);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f6d365;
+            position: absolute;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .history-toggle {
+            text-align: center;
+            margin-top: 20px;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .history-toggle:hover {
+            color: #764ba2;
+        }
+
+        .history-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .history-container.show {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 10px;
+            font-size: 0.9em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-winner {
+            font-weight: 700;
+        }
+
+        .clear-history {
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .coin {
+                width: 180px;
+                height: 180px;
+            }
+
+            .result {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🪙 Decision Coin</h1>
+            <p class="subtitle">Can't decide? Let fate choose!</p>
+        </header>
+
+        <div class="options-container">
+            <div class="option-group">
+                <label class="option-label option-a-label">Option A</label>
+                <input 
+                    type="text" 
+                    id="optionA" 
+                    class="option-a-input"
+                    placeholder="Pizza" 
+                    maxlength="30"
+                    autocomplete="off"
+                >
+            </div>
+
+            <div class="vs-divider">VS</div>
+
+            <div class="option-group">
+                <label class="option-label option-b-label">Option B</label>
+                <input 
+                    type="text" 
+                    id="optionB" 
+                    class="option-b-input"
+                    placeholder="Tacos" 
+                    maxlength="30"
+                    autocomplete="off"
+                >
+            </div>
+        </div>
+
+        <div class="coin-container">
+            <div class="coin" id="coin" onclick="flipCoin()">
+                <div class="coin-text">
+                    TAP TO FLIP
+                    <div class="coin-instruction">🎲</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-container">
+            <div class="result" id="result"></div>
+            <div class="result-label" id="resultLabel"></div>
+            <button class="flip-again-btn" id="flipAgainBtn" onclick="resetFlip()">
+                🔄 Flip Again
+            </button>
+        </div>
+
+        <div class="history-toggle" onclick="toggleHistory()">
+            📜 View History
+        </div>
+
+        <div class="history-container" id="historyContainer">
+            <div id="historyList"></div>
+            <div class="clear-history" onclick="clearHistory()">Clear History</div>
+        </div>
+    </div>
+
+    <script>
+        let history = JSON.parse(localStorage.getItem('decisionHistory')) || [];
+        let isFlipping = false;
+
+        function flipCoin() {
+            if (isFlipping) return;
+
+            const optionA = document.getElementById('optionA').value.trim() || 'Heads';
+            const optionB = document.getElementById('optionB').value.trim() || 'Tails';
+            const coin = document.getElementById('coin');
+            const result = document.getElementById('result');
+            const resultLabel = document.getElementById('resultLabel');
+            const flipAgainBtn = document.getElementById('flipAgainBtn');
+
+            // Reset previous result
+            result.classList.remove('show', 'winner-a', 'winner-b');
+            resultLabel.classList.remove('show');
+            flipAgainBtn.classList.remove('show');
+
+            // Start flipping
+            isFlipping = true;
+            coin.classList.add('flipping');
+
+            // Play flip sound (optional - would need audio file)
+            // new Audio('flip.mp3').play();
+
+            // Random result
+            const isOptionA = Math.random() < 0.5;
+            const winner = isOptionA ? optionA : optionB;
+
+            // Show result after animation
+            setTimeout(() => {
+                coin.classList.remove('flipping');
+                
+                result.textContent = winner;
+                result.classList.add('show', isOptionA ? 'winner-a' : 'winner-b');
+                
+                resultLabel.textContent = 'The coin has decided!';
+                resultLabel.classList.add('show');
+                
+                flipAgainBtn.classList.add('show');
+
+                // Add confetti
+                createConfetti();
+
+                // Save to history
+                addToHistory(optionA, optionB, winner);
+
+                isFlipping = false;
+            }, 1500);
+        }
+
+        function resetFlip() {
+            const result = document.getElementById('result');
+            const resultLabel = document.getElementById('resultLabel');
+            const flipAgainBtn = document.getElementById('flipAgainBtn');
+
+            result.classList.remove('show');
+            resultLabel.classList.remove('show');
+            flipAgainBtn.classList.remove('show');
+        }
+
+        function createConfetti() {
+            const colors = ['#f6d365', '#fda085', '#4A90D9', '#F5A623', '#667eea', '#764ba2'];
+            const container = document.querySelector('.container');
+            
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'absolute';
+                    confetti.style.width = Math.random() * 10 + 5 + 'px';
+                    confetti.style.height = confetti.style.width;
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.top = '-10px';
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    confetti.style.opacity = '1';
+                    confetti.style.animation = `confetti-fall ${Math.random() * 2 + 2}s ease-out forwards`;
+                    
+                    container.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 30);
+            }
+        }
+
+        function addToHistory(optionA, optionB, winner) {
+            const timestamp = new Date().toLocaleString();
+            history.unshift({ optionA, optionB, winner, timestamp });
+            
+            // Keep only last 20 entries
+            if (history.length > 20) {
+                history = history.slice(0, 20);
+            }
+            
+            localStorage.setItem('decisionHistory', JSON.stringify(history));
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; color: #999;">No decisions yet!</p>';
+                return;
+            }
+            
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item">
+                    <span>${item.optionA} vs ${item.optionB}</span>
+                    <span class="history-winner" style="color: ${item.winner === item.optionA ? '#4A90D9' : '#F5A623'}">
+                        → ${item.winner}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function toggleHistory() {
+            const historyContainer = document.getElementById('historyContainer');
+            historyContainer.classList.toggle('show');
+            updateHistoryDisplay();
+        }
+
+        function clearHistory() {
+            if (confirm('Clear all decision history?')) {
+                history = [];
+                localStorage.removeItem('decisionHistory');
+                updateHistoryDisplay();
+            }
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !isFlipping) {
+                flipCoin();
+            }
+        });
+
+        // Mobile shake detection (optional)
+        if (window.DeviceMotionEvent) {
+            let lastTime = new Date().getTime();
+            let lastX, lastY, lastZ;
+            
+            window.addEventListener('devicemotion', (e) => {
+                const current = e.accelerationIncludingGravity;
+                const currentTime = new Date().getTime();
+                
+                if ((currentTime - lastTime) > 100) {
+                    const diffTime = currentTime - lastTime;
+                    lastTime = currentTime;
+                    
+                    const x = current.x;
+                    const y = current.y;
+                    const z = current.z;
+                    
+                    if (lastX !== undefined) {
+                        const speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
+                        
+                        if (speed > 3000 && !isFlipping) {
+                            flipCoin();
+                        }
+                    }
+                    
+                    lastX = x;
+                    lastY = y;
+                    lastZ = z;
+                }
+            });
+        }
+
+        // Initialize
+        updateHistoryDisplay();
+    </script>
+</body>
+</html>
